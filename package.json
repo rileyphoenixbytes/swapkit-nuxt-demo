@@ -11,7 +11,10 @@
   },
   "dependencies": {
     "@swapkit/sdk": "^1.0.0-rc.136",
+    "crypto-browserify": "^3.12.0",
     "nuxt": "^3.11.2",
+    "stream-browserify": "^3.0.0",
+    "unenv": "^1.9.0",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0"
   }
