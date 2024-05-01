@@ -1,5 +1,9 @@
 import { ChainflipPlugin } from "@swapkit/chainflip";
-import type { ConnectWalletParams } from "@swapkit/core";
+import {
+  AssetValue,
+  SwapKitApi,
+  type ConnectWalletParams,
+} from "@swapkit/core";
 import { SwapKit, Chain } from "@swapkit/core";
 import { MayachainPlugin, ThorchainPlugin } from "@swapkit/thorchain";
 import { coinbaseWallet } from "@swapkit/wallet-coinbase";
@@ -43,26 +47,10 @@ export const getSwapKitClient = async () => {
   return sdkClient;
 };
 
-// const client = SwapKitSDK.createSwapKit({
-//   config: {
-//     stagenet: false,
-//     /**
-//      * @required for AVAX & BSC
-//      */
-//     covalentApiKey: process.env.COVALENT_API_KEY,
-//     /**
-//      * @required for ETH
-//      */
-//     ethplorerApiKey: process.env.ETHPLORER_API_KEY,
-//     /**
-//      * @required for BTC, LTC, DOGE & BCH
-//      */
-//     // utxoApiKey: process.env.UTXO_API_KEY,
-//   },
-// });
 const connectChains = [Chain.Ethereum, Chain.Bitcoin, Chain.THORChain];
 
 export const connectWallet = async () => {
+  await AssetValue.loadStaticAssets();
   await getSwapKitClient();
   // @ts-expect-error
   return sdkClient.connectXDEFI(connectChains);
@@ -75,4 +63,32 @@ export const fetchWalletBalances = async () => {
 
   console.log(wallets);
   // [{ balance: AssetAmount[]; address: string; walletType: WalletOption }]
+};
+
+export const transfer = (params: {
+  assetValue: AssetValue;
+  recipient: string;
+}) => {
+  const walletInstance = sdkClient.getWallet(params.assetValue.chain);
+  return walletInstance.transfer({ ...params, from: walletInstance.address });
+};
+
+export const swap = async () => {
+  const senderAddress = sdkClient.getWallet(Chain.Ethereum).address;
+  const recipientAddress = sdkClient.getWallet(Chain.THORChain).address;
+  const { routes } = await SwapKitApi.getSwapQuote({
+    sellAsset: "ETH.ETH",
+    sellAmount: "0.01",
+    buyAsset: "THOR.RUNE",
+    senderAddress,
+    recipientAddress,
+    slippage: "3",
+  });
+  console.log(routes);
+
+  return sdkClient.swap({
+    pluginName: "thorchain",
+    recipient: recipientAddress,
+    route: routes[0],
+  });
 };

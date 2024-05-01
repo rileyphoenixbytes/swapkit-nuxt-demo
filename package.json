@@ -10,7 +10,6 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@swapkit/sdk": "1.0.0-rc.168",
     "@swapkit/api": "1.0.0-rc.64",
     "@swapkit/chainflip": "1.0.0-rc.50",
     "@swapkit/core": "1.0.0-rc.144",
