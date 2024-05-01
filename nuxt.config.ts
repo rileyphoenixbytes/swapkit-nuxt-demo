@@ -1,6 +1,15 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import wasm from 'vite-plugin-wasm'
+
 export default defineNuxtConfig({
-  devtools: { enabled: true },
+  ssr: false,
+  devtools: {
+    enabled: true,
+
+    timeline: {
+      enabled: true,
+    },
+  },
   vite: {
     build: {
       target: 'esnext',
@@ -19,6 +28,7 @@ export default defineNuxtConfig({
       global: 'globalThis',
     },
     plugins: [
+      wasm(),
       {
         // work around for `exports is not defined` error within the crypto-browserify > randomfill dep
         name: 'crypto-randomfill-patch',
@@ -58,5 +68,4 @@ export default defineNuxtConfig({
       },
     },
   },
-
 })
